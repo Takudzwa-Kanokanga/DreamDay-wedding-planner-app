@@ -1,4 +1,4 @@
-export default function Home() {
+export default function Home({ onNavigate }: { onNavigate?: (page: string) => void }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
       <div className="max-w-7xl mx-auto px-6 py-20">
@@ -9,7 +9,10 @@ export default function Home() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
             Everything you need to create your perfect day, all in one place. From budget tracking to guest management, we've got you covered.
           </p>
-          <button className="px-8 py-4 bg-pink-300 text-white rounded-full font-medium hover:bg-pink-400 transition-colors text-lg">
+          <button
+            onClick={() => onNavigate?.('dashboard')}
+            className="px-8 py-4 bg-pink-300 text-white rounded-full font-medium hover:bg-pink-400 transition-colors text-lg"
+          >
             Start Planning Now
           </button>
         </div>

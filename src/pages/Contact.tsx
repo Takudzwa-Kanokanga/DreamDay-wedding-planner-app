@@ -1,5 +1,6 @@
-import { Mail, Phone, MapPin, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Twitter, Linkedin, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -7,10 +8,35 @@ export default function Contact() {
     email: '',
     message: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const { error } = await supabase.from('contact_submissions').insert([formData]);
+
+      if (error) throw error;
+
+      setSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        message: '',
+      });
+
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err) {
+      setError('Failed to send message. Please try again.');
+      console.error('Error submitting contact form:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,6 +53,17 @@ export default function Contact() {
         <div className="grid lg:grid-cols-2 gap-12 mb-12">
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
             <h2 className="text-2xl font-serif text-gray-900 mb-6">Send us a message</h2>
+            {success && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-green-800">Message sent successfully! We'll get back to you soon.</p>
+              </div>
+            )}
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -75,9 +112,10 @@ export default function Contact() {
 
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-pink-300 text-white rounded-lg font-medium hover:bg-pink-400 transition-colors"
+                disabled={loading}
+                className="w-full px-6 py-3 bg-pink-300 text-white rounded-lg font-medium hover:bg-pink-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Inquiry
+                {loading ? 'Sending...' : 'Submit Inquiry'}
               </button>
             </form>
           </div>

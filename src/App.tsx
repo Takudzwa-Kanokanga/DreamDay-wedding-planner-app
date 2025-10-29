@@ -15,9 +15,9 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Home />;
+        return <Home onNavigate={setCurrentPage} />;
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentPage} />;
       case 'tasks':
         return <Tasks />;
       case 'budget':
@@ -29,7 +29,7 @@ function App() {
       case 'contact':
         return <Contact />;
       default:
-        return <Home />;
+        return <Home onNavigate={setCurrentPage} />;
     }
   };
 
