@@ -126,7 +126,6 @@ export default function Budget() {
     }
   };
 
-  const totalEstimated = expenses.reduce((sum, expense) => sum + expense.estimated, 0);
   const totalActual = expenses.reduce((sum, expense) => sum + expense.actual, 0);
 
   const getStatusColor = (status: string) => {
