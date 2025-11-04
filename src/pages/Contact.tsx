@@ -132,10 +132,10 @@ export default function Contact() {
                   <div>
                     <h3 className="font-medium text-gray-900 mb-1">Email</h3>
                     <a
-                      href="mailto:support@dreamday.com"
+                      href="mailto:kanokangatakudzwa@gmail.com"
                       className="text-gray-600 hover:text-pink-300 transition-colors"
                     >
-                      support@dreamday.com
+                      kanokangatakudzwa@gmail.com
                     </a>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default function Contact() {
                       href="tel:+263779361744"
                       className="text-gray-600 hover:text-pink-300 transition-colors"
                     >
-                      (555) 123-4567
+                      (+263) 779361744
                     </a>
                   </div>
                 </div>
@@ -162,9 +162,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-medium text-gray-900 mb-1">Address</h3>
                     <p className="text-gray-600">
-                      123 Wedding Lane, Love City,
+                      Harare, Zimbabwe
                       <br />
-                      LC 98765
                     </p>
                   </div>
                 </div>

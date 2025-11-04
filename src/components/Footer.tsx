@@ -11,6 +11,7 @@ export default function Footer() {
             <button className="hover:text-gray-900 transition-colors">Legal</button>
           </div>
 
+          
           <div className="flex items-center gap-4">
             <a
               href="#"
@@ -46,7 +47,7 @@ export default function Footer() {
               aria-label="YouTube"
             >
               <Youtube className="w-5 h-5 text-gray-600" />
-            </a>
+            </a> 
           </div>
         </div>
 
