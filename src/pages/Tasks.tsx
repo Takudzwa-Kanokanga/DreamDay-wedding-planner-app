@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, X, Trash2 } from 'lucide-react';
+import { Plus, Calendar, X, Trash2, Edit2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,6 +18,7 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -52,18 +53,54 @@ export default function Tasks() {
     }
   };
 
+  const openAddModal = () => {
+    setEditingTask(null);
+    setNewTask({
+      title: '',
+      description: '',
+      due_date: '',
+      priority: 'Medium Priority',
+      category: 'General',
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (task: Task) => {
+    setEditingTask(task);
+    setNewTask({
+      title: task.title,
+      description: task.description || '',
+      due_date: task.due_date || '',
+      priority: task.priority,
+      category: task.category,
+    });
+    setIsModalOpen(true);
+  };
+
   const addTask = async () => {
     if (!user || !newTask.title) return;
 
     try {
-      const { error } = await supabase.from('tasks').insert([
-        {
-          user_id: user.id,
-          ...newTask,
-        },
-      ]);
+      if (editingTask) {
+        const { error } = await supabase
+          .from('tasks')
+          .update({
+            ...newTask,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingTask.id);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('tasks').insert([
+          {
+            user_id: user.id,
+            ...newTask,
+          },
+        ]);
+
+        if (error) throw error;
+      }
 
       setNewTask({
         title: '',
@@ -72,10 +109,11 @@ export default function Tasks() {
         priority: 'Medium Priority',
         category: 'General',
       });
+      setEditingTask(null);
       setIsModalOpen(false);
       fetchTasks();
     } catch (error) {
-      console.error('Error adding task:', error);
+      console.error('Error saving task:', error);
     }
   };
 
@@ -155,7 +193,7 @@ export default function Tasks() {
             <h1 className="text-4xl font-serif text-gray-900 mb-2">Wedding Tasks</h1>
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openAddModal}
             className="flex items-center gap-2 px-6 py-3 bg-pink-300 text-white rounded-lg hover:bg-pink-400 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -231,6 +269,12 @@ export default function Tasks() {
                   </div>
 
                   <button
+                    onClick={() => openEditModal(task)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Edit2 className="w-4 h-4 text-gray-600" />
+                  </button>
+                  <button
                     onClick={() => deleteTask(task.id)}
                     className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
                   >
@@ -245,9 +289,11 @@ export default function Tasks() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-2xl font-serif text-gray-900">Add New Task</h2>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white">
+              <h2 className="text-2xl font-serif text-gray-900">
+                {editingTask ? 'Edit Task' : 'Add New Task'}
+              </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -267,6 +313,17 @@ export default function Tasks() {
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   placeholder="e.g., Book wedding venue"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  placeholder="Add task details..."
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300 resize-none"
                 />
               </div>
 
@@ -318,7 +375,7 @@ export default function Tasks() {
                   disabled={!newTask.title}
                   className="flex-1 px-4 py-3 bg-pink-300 text-white rounded-lg hover:bg-pink-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Task
+                  {editingTask ? 'Update' : 'Add'} Task
                 </button>
               </div>
             </div>
