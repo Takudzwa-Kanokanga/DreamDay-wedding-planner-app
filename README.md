@@ -84,4 +84,4 @@ This project is licensed under the MIT License.
 👩‍💻 Developer
 
 Author: Takudzwa Kanokanga
-GitHub: @Takudzwa88
+GitHub: @Takudzwa-Kanokanga
